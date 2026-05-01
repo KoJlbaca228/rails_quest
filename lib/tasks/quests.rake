@@ -9,8 +9,12 @@ namespace :quest do
 
     puts "\n\e[36m⚡ Rails Quests// Checking module #{number}...\e[0m\n\n"
 
-    require "open3"
-    output, _status = Open3.capture2e("bundle exec ruby -Itest #{test_file}")
+    require "tempfile"
+    output = Tempfile.create("quest_#{number}_test") do |file|
+      system(Gem.ruby, "-Itest", test_file.to_s, out: file, err: file)
+      file.rewind
+      file.read
+    end
     puts output
 
     # Parse minitest summary line: "X runs, Y assertions, Z failures, W errors, V skips"
